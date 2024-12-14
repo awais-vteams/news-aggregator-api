@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Domains\News\Commands;
 
 use App\Domains\News\Actions\SaveArticleAction;
 use App\Domains\News\Providers\GuardianNewsProvider;
