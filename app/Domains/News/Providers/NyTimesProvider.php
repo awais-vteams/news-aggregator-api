@@ -3,6 +3,7 @@
 namespace App\Domains\News\Providers;
 
 use App\Domains\News\DTO\NewsDto;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\LazyCollection;
@@ -33,14 +34,15 @@ class NyTimesProvider implements NewsProvider
         return LazyCollection::make(function () use ($articles) {
             foreach ($articles as $article) {
                 yield new NewsDto(
-                    title: $article['title'] ?? '',
-                    description: $article['abstract'] ?? '',
-                    url: $article['url'] ?? '',
-                    author: $article['author'] ?? '',
-                    content: $article['content'] ?? '',
-                    category: '',
+                    title: $article['title'],
+                    description: $article['abstract'] ?? null,
+                    url: $article['url'],
+                    author: $article['author'] ?? null,
+                    content: null,
+                    category: $article['item_type'] ?? null,
                     sourceName: $article['section'] ?? '',
-                    publishedAt: $article['published_date'] ?? null
+                    sourceUrl: null,
+                    publishedAt: Carbon::parse($article['published_date'])
                 );
             }
         });

@@ -15,13 +15,12 @@ class SaveArticleAction
             $newsCollection
                 ->chunk(500)
                 ->each(function ($chunk) {
-                    /** @var NewsDto $newsData */
-                    $newsData = $chunk->map(fn(NewsDto $news) => $news->toArray())->all();
-
-                    Article::updateOrCreate(
-                        ['url' => $newsData->url],
-                        $newsData
-                    );
+                    $chunk->each(function (NewsDto $news) {
+                        Article::updateOrCreate(
+                            ['url' => $news->url],
+                            $news->toArray()
+                        );
+                    });
                 });
         });
     }

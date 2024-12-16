@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
+ * @property string $ulid
  * @property int $user_id
  * @property array $sources
  * @property array $categories
@@ -15,6 +16,8 @@ use Illuminate\Database\Eloquent\Model;
 class UserPreference extends Model
 {
     use HasUlids, HasFactory;
+
+    protected $primaryKey = 'ulid';
 
     protected $fillable = [
         'user_id',

@@ -7,7 +7,6 @@ use App\Domains\News\Providers\GuardianNewsProvider;
 use App\Domains\News\Providers\NewsApiProvider;
 use App\Domains\News\Providers\NewsProvider;
 use App\Domains\News\Providers\NyTimesProvider;
-use Exception;
 use Illuminate\Console\Command;
 
 class FetchNews extends Command
@@ -31,27 +30,23 @@ class FetchNews extends Command
      */
     public function handle(SaveArticleAction $saveArticleAction)
     {
-        try {
-            /** @var NewsProvider[] $newsProviders */
-            $newsProviders = [
-                new NewsApiProvider,
-                new GuardianNewsProvider,
-                new NyTimesProvider,
-            ];
+        /** @var NewsProvider[] $newsProviders */
+        $newsProviders = [
+            new NewsApiProvider,
+            new GuardianNewsProvider,
+            new NyTimesProvider,
+        ];
 
-            foreach ($newsProviders as $provider) {
-                $this->info('Fetching news from provider: '.get_class($provider));
+        foreach ($newsProviders as $provider) {
+            $this->info('Fetching news from provider: '.class_basename($provider));
 
-                $newsCollection = $provider->fetchNews();
+            $newsCollection = $provider->fetchNews();
 
-                $saveArticleAction->run($newsCollection);
+            $saveArticleAction->run($newsCollection);
 
-                $this->info('Successfully saved news from provider: '.get_class($provider));
-            }
-
-            $this->info('News fetching completed.');
-        } catch (Exception $e) {
-            $this->error('Error: '.$e->getMessage());
+            $this->info('Successfully saved news from provider: '.class_basename($provider));
         }
+
+        $this->info('News fetching completed.');
     }
 }

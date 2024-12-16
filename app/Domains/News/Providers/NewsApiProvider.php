@@ -3,6 +3,7 @@
 namespace App\Domains\News\Providers;
 
 use App\Domains\News\DTO\NewsDto;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\LazyCollection;
@@ -34,15 +35,16 @@ class NewsApiProvider implements NewsProvider
         return LazyCollection::make(function () use ($articles) {
             foreach ($articles as $article) {
                 yield new NewsDto(
-                    title: $article['webTitle'],
-                    description: $article['fields']['trailText'] ?? '',
-                    url: $article['webUrl'],
-                    author: $article['author'] ?? '',
-                    content: $article['fields']['bodyText'] ?? '',
-                    category: 'general',
-                    sourceName: 'The Guardian',
-                    publishedAt: $article['webPublicationDate'] ?? null
-                );;
+                    title: $article['title'],
+                    description: $article['description'] ?? null,
+                    url: $article['url'],
+                    author: $article['author'] ?? null,
+                    content: $article['content'] ?? null,
+                    category: 'top-headlines',
+                    sourceName: $article['source']['name'] ?? null,
+                    sourceUrl: null,
+                    publishedAt: Carbon::parse($article['publishedAt'])
+                );
             }
         });
     }

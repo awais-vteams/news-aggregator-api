@@ -12,14 +12,14 @@ return new class extends Migration {
     {
         Schema::create('articles', function (Blueprint $table) {
             $table->ulid()->primary();
-            $table->string('title')->index();
-            $table->string('description')->index();
-            $table->string('url')->unique();
-            $table->string('author')->index();
-            $table->text('content');
-            $table->string('category');
-            $table->string('source_name')->index();
-            $table->string('source_url');
+            $table->string('title', 500)->index();
+            $table->string('description', 500)->index()->nullable();
+            $table->string('url', 2000)->unique();
+            $table->string('author', 500)->index()->nullable();
+            $table->text('content')->nullable();
+            $table->string('category', 500)->nullable();
+            $table->string('source_name')->nullable();
+            $table->string('source_url', 500)->nullable();
             $table->datetime('published_at')->index();
             $table->timestamps();
         });

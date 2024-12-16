@@ -8,9 +8,14 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @mixin Builder
+ */
 class Article extends Model
 {
     use HasUlids, HasFactory;
+
+    protected $primaryKey = 'ulid';
 
     protected $perPage = 20;
 

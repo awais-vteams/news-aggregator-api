@@ -3,6 +3,7 @@
 namespace App\Domains\News\Providers;
 
 use App\Domains\News\DTO\NewsDto;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\LazyCollection;
@@ -22,7 +23,7 @@ class GuardianNewsProvider implements NewsProvider
     {
         $response = Http::get("{$this->baseUrl}/search", [
             'api-key' => $this->apiKey,
-            'section' => 'world',
+            //'section' => 'world',
         ]);
 
         if ($response->failed()) {
@@ -35,13 +36,14 @@ class GuardianNewsProvider implements NewsProvider
             foreach ($articles as $article) {
                 yield new NewsDto(
                     title: $article['webTitle'],
-                    description: $article['fields']['trailText'] ?? '',
+                    description: $article['fields']['trailText'] ?? null,
                     url: $article['webUrl'],
-                    author: $article['author'] ?? '',
-                    content: $article['fields']['bodyText'] ?? '',
-                    category: 'general',
+                    author: $article['author'] ?? null,
+                    content: $article['fields']['bodyText'] ?? null,
+                    category: $article['pillarName'] ?? null,
                     sourceName: 'The Guardian',
-                    publishedAt: $article['webPublicationDate'] ?? null
+                    sourceUrl: null,
+                    publishedAt: Carbon::parse($article['webPublicationDate'])
                 );
             }
         });
