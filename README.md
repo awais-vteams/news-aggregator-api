@@ -23,9 +23,9 @@ cd news-aggregator-api
 2. Update the following keys in the `.env` file:
     - `DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`
     - Add your API keys for the news providers:
-        - `NEWSAPI_KEY`
-        - `NYTIMES_KEY`
-        - `GUARDIAN_KEY`
+        - `NEWS_API_KEY`
+        - `NYTIMES_API_KEY`
+        - `GUARDIAN_API_KEY`
 
 ---
 
