@@ -6,7 +6,6 @@ use App\Models\User;
 use Illuminate\Support\Facades\Cache;
 
 it('retrieves user preferences successfully', function () {
-    // Arrange: Create a user and user preferences
     $user = User::factory()->create();
     $preferences = UserPreference::factory()->create([
         'user_id' => $user->id,
@@ -15,10 +14,8 @@ it('retrieves user preferences successfully', function () {
         'sources' => ['TechCrunch', 'NYTimes'],
     ]);
 
-    // Act: Send a GET request to fetch preferences
     $response = $this->actingAs($user)->getJson(route('preferences.set'));
 
-    // Assert: Response should include preferences
     $response->assertOk()
         ->assertJson([
             'data' => [
@@ -107,10 +104,8 @@ it('retrieves personalized articles based on user preferences', function () {
     // Clear cache to ensure fresh results
     Cache::forget('user_'.$user->id.'_personalized_articles');
 
-    // Act
-    $response = $this->actingAs($user)->get('/api/personalized-articles');
+    $response = $this->actingAs($user)->get(route('preferences.personalized'));
 
-    // Assert
     $response->assertStatus(200);
     $response->assertJsonFragment(['source_name' => 'TechCrunch']);
     $response->assertJsonFragment(['source_name' => 'NYTimes']);
@@ -118,17 +113,14 @@ it('retrieves personalized articles based on user preferences', function () {
 
     $data = $response->json('data');
 
-    // Check that the response only contains matching articles
     expect($data)->toHaveCount(2)
         ->and($data[0]['source_name'])->toBe('NYTimes')
         ->and($data[1]['source_name'])->toBe('TechCrunch');
 });
 
 it('returns 404 when fetching articles if preferences are not set', function () {
-    // Arrange: Create a user without preferences
     $user = User::factory()->create();
 
-    // Act: Send a GET request to fetch personalized articles
     $response = $this->actingAs($user)->getJson(route('preferences.personalized'));
 
     // Assert: Response should return 404
