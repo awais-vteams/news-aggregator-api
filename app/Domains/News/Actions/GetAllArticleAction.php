@@ -7,11 +7,12 @@ use App\Domains\News\Models\Article;
 use App\Domains\News\Requests\AllArticleRequest;
 use App\Domains\News\Resources\ArticleResource;
 use Carbon\Carbon;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Cache;
 
 class GetAllArticleAction
 {
-    public function run(AllArticleRequest $request)
+    public function run(AllArticleRequest $request): AnonymousResourceCollection
     {
         $filters = $request->only(['keyword', 'date', 'category', 'source']);
         $page = $request->get('page', 1);

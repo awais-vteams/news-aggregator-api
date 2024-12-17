@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Cache;
 
 class GetSingleArticleAction
 {
-    public function run(string $id)
+    public function run(string $id): ArticleResource
     {
         $cacheKey = "article_{$id}";
 

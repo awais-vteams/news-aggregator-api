@@ -31,12 +31,12 @@ class Article extends Model
     public function scopeFilter(Builder $query, ArticleFilterDto $filter): Builder
     {
         $query->when($filter->keyword, function ($query, $filter) {
-            $query->where('title', 'ilike', '%'.$filter.'%')
-                ->orWhere('description', 'ilike', '%'.$filter.'%');
+            $query->whereLike('title', $filter)
+                ->orWhereLike('description', $filter);
         })->when($filter->date, function ($query, $filter) {
             $query->whereDate('published_at', $filter);
         })->when($filter->category, function ($query, $filter) {
-            $query->where('category', 'ilike', '%'.$filter.'%');
+            $query->whereLike('category', $filter);
         })->when($filter->source, function ($query, $filter) {
             $query->where('source', $filter);
         });

@@ -1,8 +1,9 @@
 <?php
 
-use App\Domains\News\Actions\GetUserPreferenceArticleAction;
+use App\Domains\News\Models\Article;
 use App\Domains\News\Models\UserPreference;
 use App\Models\User;
+use Illuminate\Support\Facades\Cache;
 
 it('retrieves user preferences successfully', function () {
     // Arrange: Create a user and user preferences
@@ -72,40 +73,55 @@ it('sets user preferences successfully', function () {
 });
 
 it('retrieves personalized articles based on user preferences', function () {
-    // Arrange: Create a user and preferences
+    // Arrange
     $user = User::factory()->create();
-    UserPreference::factory()->create([
+    $preferences = UserPreference::factory()->create([
         'user_id' => $user->id,
-        'categories' => ['technology'],
-        'authors' => ['John Doe'],
-        'sources' => ['TechCrunch'],
+        'sources' => ['TechCrunch', 'NYTimes'],
+        'categories' => ['technology', 'sports'],
+        'authors' => ['John Doe', 'Jane Smith'],
     ]);
 
-    // Mock the personalized articles action
-    $this->mock(GetUserPreferenceArticleAction::class, function ($mock) {
-        $mock->shouldReceive('run')
-            ->once()
-            ->andReturn([
-                [
-                    'title' => 'Tech News Today',
-                    'author' => 'John Doe',
-                    'source' => 'TechCrunch',
-                ],
-            ]);
-    });
+    // Create matching and non-matching articles
+    $matchingArticle1 = Article::factory()->create([
+        'source_name' => 'TechCrunch',
+        'category' => 'technology',
+        'author' => 'John Doe',
+        'published_at' => now(),
+    ]);
 
-    // Act: Send a GET request to fetch personalized articles
-    $response = $this->actingAs($user)->getJson(route('preferences.personalized'));
+    $matchingArticle2 = Article::factory()->create([
+        'source_name' => 'NYTimes',
+        'category' => 'sports',
+        'author' => 'Jane Smith',
+        'published_at' => now(),
+    ]);
 
-    // Assert: Response should return personalized articles
-    $response->assertOk()
-        ->assertJson([
-            [
-                'title' => 'Tech News Today',
-                'author' => 'John Doe',
-                'source' => 'TechCrunch',
-            ],
-        ]);
+    $nonMatchingArticle = Article::factory()->create([
+        'source_name' => 'Another Source',
+        'category' => 'health',
+        'author' => 'Someone Else',
+        'published_at' => now(),
+    ]);
+
+    // Clear cache to ensure fresh results
+    Cache::forget('user_'.$user->id.'_personalized_articles');
+
+    // Act
+    $response = $this->actingAs($user)->get('/api/personalized-articles');
+
+    // Assert
+    $response->assertStatus(200);
+    $response->assertJsonFragment(['source_name' => 'TechCrunch']);
+    $response->assertJsonFragment(['source_name' => 'NYTimes']);
+    $response->assertJsonMissing(['source_name' => 'Another Source']);
+
+    $data = $response->json('data');
+
+    // Check that the response only contains matching articles
+    expect($data)->toHaveCount(2)
+        ->and($data[0]['source_name'])->toBe('NYTimes')
+        ->and($data[1]['source_name'])->toBe('TechCrunch');
 });
 
 it('returns 404 when fetching articles if preferences are not set', function () {

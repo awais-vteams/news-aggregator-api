@@ -5,29 +5,30 @@ namespace App\Domains\News\Actions;
 use App\Domains\News\Models\Article;
 use App\Domains\News\Models\UserPreference;
 use App\Domains\News\Resources\ArticleResource;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Cache;
 
 class GetUserPreferenceArticleAction
 {
-    public function run(UserPreference $preferences)
+    public function run(UserPreference $preferences): AnonymousResourceCollection
     {
         $query = Article::query();
 
         if (filled($preferences->sources)) {
             foreach ($preferences->sources as $source) {
-                $query->orWhere('source_name', 'ilike', '%'.$source.'%');
+                $query->orWhereLike('source_name', $source);
             }
         }
 
         if (filled($preferences->categories)) {
             foreach ($preferences->categories as $category) {
-                $query->orWhere('category', 'ilike', '%'.$category.'%');
+                $query->orWhereLike('category', $category);
             }
         }
 
         if (filled($preferences->authors)) {
             foreach ($preferences->authors as $author) {
-                $query->orWhere('author', 'ilike', '%'.$author.'%');
+                $query->orWhereLike('author', $author);
             }
         }
 
