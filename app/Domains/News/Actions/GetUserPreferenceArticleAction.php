@@ -14,15 +14,21 @@ class GetUserPreferenceArticleAction
         $query = Article::query();
 
         if (filled($preferences->sources)) {
-            $query->whereIn('source_name', $preferences->sources);
+            foreach ($preferences->sources as $source) {
+                $query->orWhere('source_name', 'ilike', '%'.$source.'%');
+            }
         }
 
         if (filled($preferences->categories)) {
-            $query->whereIn('category', $preferences->categories);
+            foreach ($preferences->categories as $category) {
+                $query->orWhere('category', 'ilike', '%'.$category.'%');
+            }
         }
 
         if (filled($preferences->authors)) {
-            $query->whereIn('author', $preferences->authors);
+            foreach ($preferences->authors as $author) {
+                $query->orWhere('author', 'ilike', '%'.$author.'%');
+            }
         }
 
         $cacheKey = 'user_'.$preferences->user_id.'_personalized_articles';

@@ -6,18 +6,19 @@ use App\Domains\News\Actions\GetUserPreferenceAction;
 use App\Domains\News\Actions\GetUserPreferenceArticleAction;
 use App\Domains\News\Actions\SaveUserPreferenceAction;
 use App\Domains\News\Requests\UserPreferenceRequest;
+use App\Domains\News\Resources\UserPreferenceResource;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
 
 class UserPreferenceController extends Controller
 {
     /**
      * Get the user's preferences.
      */
-    public function getPreferences(Request $request, GetUserPreferenceAction $userPreferenceAction): JsonResponse
+    public function getPreferences(Request $request, GetUserPreferenceAction $userPreferenceAction): ?UserPreferenceResource
     {
-        return response()->json($userPreferenceAction->run($request->user()->id));
+        return new UserPreferenceResource($userPreferenceAction->run($request->user()->id));
     }
 
     /**
@@ -27,7 +28,9 @@ class UserPreferenceController extends Controller
     {
         $preferences = $userPreferenceAction->run($request->user()->id, $request->validated());
 
-        return response()->json($preferences, 201);
+        return (new UserPreferenceResource($preferences))
+            ->response()
+            ->setStatusCode(201);
     }
 
     public function getPersonalizedArticles(

@@ -1,0 +1,218 @@
+openapi: 3.0.1
+info:
+  title: News Aggregator API
+  description: A RESTful API for managing articles/news and user preferences.
+  version: 1.0.0
+servers:
+  - url: http://localhost/api
+    description: Local News Aggregator Server
+components:
+  securitySchemes:
+    SanctumAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Article:
+      type: object
+      properties:
+        id:
+          type: string
+          description: A unique identifier for the article
+          format: ulid
+        title:
+          type: string
+        description:
+          type: string
+        url:
+          type: string
+        author:
+          type: string
+        content:
+          type: string
+        category:
+          type: string
+        source_name:
+          type: string
+        published_at:
+          type: string
+          format: date-time
+    UserPreference:
+      type: object
+      properties:
+        id:
+          type: string
+          description: A unique identifier for the user preference
+          format: ulid
+        user_id:
+          type: string
+          description: A unique identifier for the user
+          format: ulid
+        sources:
+          type: array
+          items:
+            type: string
+        categories:
+          type: array
+          items:
+            type: string
+        authors:
+          type: array
+          items:
+            type: string
+security:
+  - SanctumAuth: []
+paths:
+  /articles:
+    get:
+      summary: Get all articles
+      description: Retrieve a list of all articles with pagination.
+      tags:
+        - Articles
+      security:
+        - SanctumAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: Page number for pagination
+          required: false
+          schema:
+            type: integer
+        - name: keyword
+          in: query
+          description: Filter articles by a keyword
+          required: false
+          schema:
+            type: string
+        - name: category
+          in: query
+          description: Filter articles by category
+          required: false
+          schema:
+            type: string
+        - name: source_name
+          in: query
+          description: Filter articles by source name
+          required: false
+          schema:
+            type: string
+        - name: published_at
+          in: query
+          description: Filter articles by publication date
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: A list of articles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Article'
+        '401':
+          description: Unauthorized
+    post:
+      summary: Create a new article
+      description: Add a new article to the database.
+      tags:
+        - Articles
+      security:
+        - SanctumAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Article'
+      responses:
+        '201':
+          description: Article created successfully
+        '401':
+          description: Unauthorized
+  /articles/{id}:
+    get:
+      summary: Get a single article
+      description: Retrieve details of a specific article.
+      tags:
+        - Articles
+      security:
+        - SanctumAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ULID of the article
+          schema:
+            type: string
+            format: ulid
+      responses:
+        '200':
+          description: Article details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Article'
+        '404':
+          description: Article not found
+        '401':
+          description: Unauthorized
+    delete:
+      summary: Delete an article
+      description: Remove an article from the database.
+      tags:
+        - Articles
+      security:
+        - SanctumAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ULID of the article
+          schema:
+            type: string
+            format: ulid
+      responses:
+        '204':
+          description: Article deleted successfully
+        '404':
+          description: Article not found
+        '401':
+          description: Unauthorized
+  /user/preferences:
+    get:
+      summary: Get user preferences
+      description: Retrieve the authenticated user's preferences.
+      tags:
+        - User Preferences
+      security:
+        - SanctumAuth: []
+      responses:
+        '200':
+          description: User preferences retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPreference'
+        '401':
+          description: Unauthorized
+    post:
+      summary: Update user preferences
+      description: Set or update the authenticated user's preferences.
+      tags:
+        - User Preferences
+      security:
+        - SanctumAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserPreference'
+      responses:
+        '200':
+          description: User preferences updated successfully
+        '401':
+          description: Unauthorized

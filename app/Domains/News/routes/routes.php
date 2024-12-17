@@ -10,5 +10,5 @@ Route::middleware(['auth:sanctum', 'api'])->group(function () {
 
     Route::get('/preferences', [UserPreferenceController::class, 'getPreferences'])->name('preferences.get');
     Route::post('/preferences', [UserPreferenceController::class, 'setPreferences'])->name('preferences.set');
-    Route::get('/articles/personalized', [UserPreferenceController::class, 'getPersonalizedArticles'])->name('preferences.personalized');
+    Route::get('/personalized-articles', [UserPreferenceController::class, 'getPersonalizedArticles'])->name('preferences.personalized');
 });
